@@ -1,0 +1,42 @@
+﻿using Microsoft.EntityFrameworkCore;
+using EmployeeExcelAnalytics.Api.Data;
+using EmployeeExcelAnalytics.Api.Models;
+
+namespace EmployeeExcelAnalytics.Api.Repositories
+{
+    public class EmployeeRepository : IEmployeeRepository
+    {
+        private readonly AppDbContext _context;
+
+        public EmployeeRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<Employee>> GetAllAsync()
+        {
+            return await _context.Employees.ToListAsync();
+        }
+
+        public async Task<Employee?> GetByIdAsync(int id)
+        {
+            return await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<Employee> AddAsync(Employee employee)
+        {
+            await _context.Employees.AddAsync(employee);
+
+            await _context.SaveChangesAsync();
+
+            return employee;
+        }
+
+        public async Task<bool> ExistsByEmployeeCodeAsync(string employeeCode)
+        {
+            return await _context.Employees
+                .AnyAsync(e => e.EmployeeCode == employeeCode);
+        }
+    }
+}

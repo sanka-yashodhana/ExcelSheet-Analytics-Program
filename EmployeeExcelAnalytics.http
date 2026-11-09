@@ -1,0 +1,6 @@
+@EmployeeExcelAnalytics_HostAddress = http://localhost:5239
+
+GET {{EmployeeExcelAnalytics_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
