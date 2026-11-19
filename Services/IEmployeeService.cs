@@ -6,6 +6,10 @@ namespace EmployeeExcelAnalytics.Api.Services
     {
         Task<List<Employee>> GetAllEmployeesAsync();
 
+        Task<List<Employee>> GetEmployeesByImportHistoryIdAsync(int importHistoryId);
+
         Task<Employee?> GetEmployeeByIdAsync(int id);
+
+        Task<int> DeleteAllEmployeesAsync();
     }
 }

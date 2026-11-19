@@ -17,5 +17,9 @@
         public decimal Salary { get; set; }
 
         public DateTime HireDate { get; set; }
+
+        public int ImportHistoryId { get; set; }
+
+        public string ImportFileName { get; set; } = string.Empty;
     }
 }

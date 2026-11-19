@@ -17,9 +17,16 @@ namespace EmployeeExcelAnalytics.Api.Controllers
 
         // GET: api/employees
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployees()
+        public async Task<IActionResult> GetAllEmployees([FromQuery] int? importHistoryId)
         {
-            var employees = await _employeeService.GetAllEmployeesAsync();
+            if (importHistoryId.HasValue && importHistoryId.Value <= 0)
+            {
+                return BadRequest(new { message = "Import history ID must be a positive number." });
+            }
+
+            var employees = importHistoryId.HasValue
+                ? await _employeeService.GetEmployeesByImportHistoryIdAsync(importHistoryId.Value)
+                : await _employeeService.GetAllEmployeesAsync();
 
             var response = employees.Select(e => new EmployeeResponseDto
             {
@@ -30,10 +37,24 @@ namespace EmployeeExcelAnalytics.Api.Controllers
                 Department = e.Department,
                 JobTitle = e.JobTitle,
                 Salary = e.Salary,
-                HireDate = e.HireDate
+                HireDate = e.HireDate,
+                ImportHistoryId = e.ImportHistoryId,
+                ImportFileName = e.ImportHistory?.FileName ?? string.Empty
             });
 
             return Ok(response);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAllEmployees()
+        {
+            var deletedCount = await _employeeService.DeleteAllEmployeesAsync();
+
+            return Ok(new
+            {
+                message = $"Deleted {deletedCount} employee records. Import history has been preserved.",
+                deletedCount
+            });
         }
 
         // GET: api/employees/1
@@ -59,7 +80,9 @@ namespace EmployeeExcelAnalytics.Api.Controllers
                 Department = employee.Department,
                 JobTitle = employee.JobTitle,
                 Salary = employee.Salary,
-                HireDate = employee.HireDate
+                HireDate = employee.HireDate,
+                ImportHistoryId = employee.ImportHistoryId,
+                ImportFileName = employee.ImportHistory?.FileName ?? string.Empty
             };
 
             return Ok(response);

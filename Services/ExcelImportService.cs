@@ -21,7 +21,7 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                 var worksheet = workbook.Worksheets.FirstOrDefault();
 
                 if(workbook == null)
-                {
+                {   
                     result.Erros.Add("Excel file does not contain a worksheet");
                     return (result);
                 }
@@ -30,7 +30,7 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                 string[] expectedHeaders =
                 {
                     "EmployeeCode",
-                    "FirstName",
+                    "FirstName",    
                     "LastName",
                     "Department",
                     "JobTitle",

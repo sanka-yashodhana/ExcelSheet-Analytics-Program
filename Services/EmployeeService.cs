@@ -17,6 +17,11 @@ namespace EmployeeExcelAnalytics.Api.Services
             return await _employeeRepository.GetAllAsync();
         }
 
+        public async Task<List<Employee>> GetEmployeesByImportHistoryIdAsync(int importHistoryId)
+        {
+            return await _employeeRepository.GetByImportHistoryIdAsync(importHistoryId);
+        }
+
         public async Task<Employee?> GetEmployeeByIdAsync(int id)
         {
             if (id <= 0)
@@ -25,6 +30,11 @@ namespace EmployeeExcelAnalytics.Api.Services
             }
 
             return await _employeeRepository.GetByIdAsync(id);
+        }
+
+        public Task<int> DeleteAllEmployeesAsync()
+        {
+            return _employeeRepository.DeleteAllAsync();
         }
     }
 }

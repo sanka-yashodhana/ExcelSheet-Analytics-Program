@@ -18,9 +18,18 @@ namespace EmployeeExcelAnalytics.Api.Repositories
             return await _context.Employees.ToListAsync();
         }
 
+        public async Task<List<Employee>> GetByImportHistoryIdAsync(int importHistoryId)
+        {
+            return await _context.Employees
+                .Include(employee => employee.ImportHistory)
+                .Where(employee => employee.ImportHistoryId == importHistoryId)
+                .ToListAsync();
+        }
+
         public async Task<Employee?> GetByIdAsync(int id)
         {
             return await _context.Employees
+                .Include(employee => employee.ImportHistory)
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
@@ -37,6 +46,11 @@ namespace EmployeeExcelAnalytics.Api.Repositories
         {
             return await _context.Employees
                 .AnyAsync(e => e.EmployeeCode == employeeCode);
+        }
+
+        public Task<int> DeleteAllAsync()
+        {
+            return _context.Employees.ExecuteDeleteAsync();
         }
     }
 }

@@ -100,6 +100,7 @@ namespace EmployeeExcelAnalytics.Api.Services
                 result.Message = "Employees imported successfully.";
                 result.ImportHistoryId = importHistory.Id;
                 result.TotalEmployees = employees.Count;
+                result.FileName = fileName;
 
                 return result;
             }

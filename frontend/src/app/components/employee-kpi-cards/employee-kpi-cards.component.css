@@ -1,0 +1,42 @@
+.kpi-container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+}
+
+.kpi-card {
+  background: #111a14;
+  padding: 25px;
+  border: 1px solid #29382e;
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+}
+
+.kpi-card h3 {
+  color: #9caf9f;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.kpi-card h1 {
+  color: #a3e635;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+
+  .kpi-container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 560px) {
+  .kpi-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
