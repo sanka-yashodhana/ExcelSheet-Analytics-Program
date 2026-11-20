@@ -1,5 +1,5 @@
 ﻿
-namespace EmployeeExcelAnalytics.Dtos
+namespace EmployeeExcelAnalytics.Api.DTOs
 {
     public class ExcelHeaderMappingDto
     {

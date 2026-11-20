@@ -1,5 +1,5 @@
 ﻿
-using EmployeeExcelAnalytics.Dtos;
+using EmployeeExcelAnalytics.Api.DTOs;
 
 namespace EmployeeExcelAnalytics.Services
 {

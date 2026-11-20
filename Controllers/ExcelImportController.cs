@@ -4,7 +4,7 @@ using EmployeeExcelAnalytics.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClosedXML.Excel;
-using EmployeeExcelAnalytics.Dtos;
+using EmployeeExcelAnalytics.Api.DTOs;
 using System.Text.Json;
 
 namespace EmployeeExcelAnalytics.Api.Controllers
