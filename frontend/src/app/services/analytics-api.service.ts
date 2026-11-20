@@ -38,14 +38,28 @@ export interface ImportResult {
   errors: string[];
 }
 
+export interface ExcelHeaderMapping {
+  excelHeader: string;
+  suggestedField: string | null;
+  isRequired: boolean;
+  isMatched: boolean;
+}
+
+export interface ExcelHeaderDetectionResponse {
+  headers: ExcelHeaderMapping[];
+  isValid: boolean;
+  missingRequiredFields: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnalyticsApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = 'http://localhost:5239/api';
 
-  upload(file: File): Observable<ImportResult> {
+  upload(file: File, headerMappings: ExcelHeaderMapping[]): Observable<ImportResult> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('headerMappings', JSON.stringify(headerMappings));
     return this.http.post<ImportResult>(`${this.baseUrl}/ExcelImport/upload`, formData);
   }
 
@@ -82,4 +96,17 @@ export class AnalyticsApiService {
     }
     return [error.message || 'The request could not be completed.'];
   }
+
+  // Detect Excel headers
+detectHeaders(file: File): Observable<ExcelHeaderDetectionResponse> {
+
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  return this.http.post<ExcelHeaderDetectionResponse>(
+    `${this.baseUrl}/ExcelImport/detect-headers`,
+    formData
+  );
+}
 }

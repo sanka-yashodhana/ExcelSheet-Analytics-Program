@@ -1,0 +1,111 @@
+<div class="mapping-container">
+  <div
+    class="upload-section"
+    [class.dragging]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="isDragging = false"
+    (drop)="onDrop($event)"
+  >
+    <div class="drop-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>{{ selectedFile ? selectedFile.name : 'Drop your workbook here' }}</h3>
+    <p>{{ selectedFile ? 'Review the detected columns below' : 'Choose an .xlsx workbook to detect and map its headers' }}</p>
+    <input
+      #fileInput
+      class="file-input"
+      type="file"
+      accept=".xlsx"
+      (change)="onFileSelected($event)"
+      [disabled]="isImporting"
+      aria-label="Choose an Excel workbook"
+    />
+    <button class="browse-button" type="button" (click)="fileInput.click()" [disabled]="isImporting">
+      {{ selectedFile ? 'Choose another file' : 'Browse files' }}
+    </button>
+  </div>
+  <p class="file-limit">Excel workbook <b>·</b> .xlsx format <b>·</b> Up to 5 MB</p>
+
+  <div class="selected-file" *ngIf="selectedFile">
+    <span class="file-badge">XLSX</span>
+    <div class="file-info">
+      <strong>{{ selectedFile.name }}</strong>
+      <small>{{ isLoading ? 'Detecting headers…' : 'Ready to map' }}</small>
+    </div>
+    <button class="remove-file" type="button" aria-label="Remove selected file" (click)="clearFile()" [disabled]="isImporting">×</button>
+  </div>
+
+  <div class="mapping-message" *ngIf="isLoading" role="status">Detecting Excel headers…</div>
+  <div class="mapping-message mapping-success" *ngIf="successMessage && !isLoading">{{ successMessage }}</div>
+  <div class="mapping-message mapping-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div *ngIf="headers.length > 0" class="mapping-section">
+    <div class="mapping-heading">
+      <div>
+        <h3>Match spreadsheet columns</h3>
+        <p>Check the suggested fields. You can change a match before importing.</p>
+      </div>
+      <span class="mapping-count">{{ headers.length }} columns</span>
+    </div>
+    <div class="mapping-table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Excel Header</th>
+            <th>Employee Field</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let header of headers; let i = index">
+            <tr *ngIf="header.excelHeader">
+              <td><span class="excel-header-name">{{ header.excelHeader }}</span></td>
+              <td>
+                <select
+                  [ngModel]="header.suggestedField ?? ''"
+                  (ngModelChange)="updateMapping(i, $event)"
+                  [disabled]="isImporting || isLoading"
+                  [attr.aria-label]="'Map ' + header.excelHeader"
+                >
+                  <option value="">Ignore column</option>
+                  <option
+                    *ngFor="let field of employeeFields"
+                    [value]="field"
+                    [disabled]="isFieldMappedElsewhere(i, field)"
+                  >{{ field }}</option>
+                </select>
+              </td>
+              <td>
+                <span [class.matched]="header.suggestedField" [class.unmatched]="!header.suggestedField">
+                  {{ header.suggestedField ? 'Matched' : 'Unmapped' }}
+                </span>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="validation-section">
+      <div *ngIf="missingRequiredFields.length === 0" class="validation-success">
+        All required employee fields are mapped.
+      </div>
+      <div *ngIf="missingRequiredFields.length > 0" class="validation-error">
+        <strong>Map the required fields to continue:</strong>
+        <ul>
+          <li *ngFor="let field of missingRequiredFields">{{ field }}</li>
+        </ul>
+      </div>
+    </div>
+    <button
+      class="primary-button import-button"
+      type="button"
+      [disabled]="!isMappingValid || isLoading || isImporting || importCompleted"
+      (click)="requestImport()"
+    >
+      {{ isImporting ? 'Importing…' : importCompleted ? 'Imported — choose another workbook' : 'Continue & import' }}
+    </button>
+  </div>
+</div>

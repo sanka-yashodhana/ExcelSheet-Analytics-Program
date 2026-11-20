@@ -1,0 +1,269 @@
+.mapping-container {
+  padding: 0 28px 28px;
+}
+
+.upload-section {
+  position: relative;
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+  border: 2px dashed #3a5140;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #111a14, #152219);
+  text-align: center;
+  transition: border-color .2s, background .2s;
+}
+
+.upload-section:hover,
+.upload-section.dragging {
+  border-color: #a3e635;
+  background: linear-gradient(135deg, #17251a, #1d2d1c);
+}
+
+.upload-section h3 {
+  margin: 0;
+  color: #edf7ef;
+  font: 700 16px Manrope, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.upload-section p {
+  margin: 8px 0 0;
+  color: #9caf9f;
+  font-size: 13px;
+}
+
+.upload-section .browse-button {
+  margin-top: 18px;
+}
+
+.file-limit {
+  margin: 12px 0 0;
+  color: #9caf9f;
+  text-align: center;
+  font-size: 11px;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #34463a;
+  border-radius: 10px;
+  background: #0c140f;
+}
+
+.file-badge {
+  width: 40px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 8px;
+  background: #263b25;
+  color: #b7ee70;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-info strong,
+.file-info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-info strong {
+  color: #edf7ef;
+  font-size: 12px;
+}
+
+.file-info small {
+  margin-top: 4px;
+  color: #9caf9f;
+  font-size: 10px;
+}
+
+.remove-file {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: #9caf9f;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.remove-file:hover {
+  color: #edf7ef;
+}
+
+.mapping-message {
+  margin-top: 14px;
+  color: #c4d2c7;
+  font-size: 12px;
+}
+
+.mapping-success,
+.matched {
+  color: #b7ee70;
+}
+
+.mapping-error,
+.unmatched {
+  color: #ffb4aa;
+}
+
+.mapping-section {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #29382e;
+  border-radius: 12px;
+  background: #0d1510;
+}
+
+.mapping-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mapping-heading h3 {
+  margin: 0;
+  color: #edf7ef;
+  font: 700 16px Manrope, sans-serif;
+}
+
+.mapping-heading p {
+  margin: 6px 0 0;
+  color: #9caf9f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mapping-count {
+  flex: none;
+  color: #a3e635;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mapping-table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #26352b;
+  text-align: left;
+}
+
+th {
+  color: #9caf9f;
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+td {
+  color: #c4d2c7;
+  font-size: 12px;
+}
+
+.excel-header-name {
+  color: #edf7ef;
+  font-weight: 600;
+}
+
+select {
+  width: 100%;
+  min-width: 160px;
+  padding: 9px 10px;
+  border: 1px solid #34463a;
+  border-radius: 7px;
+  background: #111a14;
+  color: #edf7ef;
+  font: inherit;
+}
+
+select:focus {
+  border-color: #a3e635;
+  outline: 2px solid rgba(163, 230, 53, .15);
+}
+
+.matched,
+.unmatched {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.validation-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #26352b;
+  font-size: 11px;
+}
+
+.validation-success {
+  color: #b7ee70;
+}
+
+.validation-error {
+  color: #ffb4aa;
+}
+
+.validation-error ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.import-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 680px) {
+  .mapping-container {
+    padding: 0 18px 22px;
+  }
+
+  .mapping-section {
+    padding: 16px;
+  }
+
+  .mapping-heading {
+    flex-direction: column;
+  }
+
+  th,
+  td {
+    padding: 10px 8px;
+  }
+}

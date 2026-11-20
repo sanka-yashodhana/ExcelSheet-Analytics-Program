@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using EmployeeExcelAnalytics.Api.Data;
 using EmployeeExcelAnalytics.Api.Repositories;
 using EmployeeExcelAnalytics.Api.Services;
 using EmployeeExcelAnalytics.APi.Srvices;
+using EmployeeExcelAnalytics.Services;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IExcelImportService, ExcelImportService>();
 builder.Services.AddScoped<IEmployeeImportService, EmployeeImportService>();
+builder.Services.AddScoped<ExcelHeaderDetectionService>();
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>

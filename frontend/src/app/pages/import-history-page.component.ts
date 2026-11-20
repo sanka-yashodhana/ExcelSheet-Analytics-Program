@@ -90,7 +90,7 @@ export class ImportHistoryPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.getImportHistories().subscribe({
-      next: histories => { this.histories = histories; this.isLoading = false; },5
+      next: histories => { this.histories = histories; this.isLoading = false; },
       error: error => { this.errors = this.api.getErrorMessages(error); this.isLoading = false; }
     });
 

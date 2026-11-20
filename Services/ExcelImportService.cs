@@ -2,14 +2,23 @@
 using EmployeeExcelAnalytics.Api.DTOs;
 using EmployeeExcelAnalytics.Api.Models;
 using EmployeeExcelAnalytics.Api.Services;
-using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
+using EmployeeExcelAnalytics.Dtos;
+using EmployeeExcelAnalytics.Services;
 
 namespace EmployeeExcelAnalytics.APi.Srvices
 {
     public class ExcelImportService: IExcelImportService
     {
-        public ExcelImportResultDto ReadEmployees(Stream fileStream)
+        private readonly ExcelHeaderDetectionService _headerDetectionService;
+
+        public ExcelImportService(ExcelHeaderDetectionService headerDetectionService)
+        {
+            _headerDetectionService = headerDetectionService;
+        }
+
+        public ExcelImportResultDto ReadEmployees(
+            Stream fileStream,
+            IReadOnlyList<ExcelHeaderMappingDto>? headerMappings = null)
         {
             var result = new ExcelImportResultDto();
 
@@ -20,50 +29,117 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                 //Get the worksheet
                 var worksheet = workbook.Worksheets.FirstOrDefault();
 
-                if(workbook == null)
+                if(worksheet == null)
                 {   
-                    result.Erros.Add("Excel file does not contain a worksheet");
+                    result.Erros.Add("Excel file does not contain a worksheet.");
                     return (result);
                 }
 
-                //Expected Columns headings
-                string[] expectedHeaders =
+                var lastHeaderColumn = worksheet.Row(1).LastCellUsed()?.Address.ColumnNumber ?? 0;
+                if (lastHeaderColumn == 0)
+                {
+                    result.Erros.Add("No headers found in the first row of the Excel file.");
+                    return result;
+                }
+
+                var excelHeaders = Enumerable.Range(1, lastHeaderColumn)
+                    .Select(column => worksheet.Cell(1, column).GetString().Trim())
+                    .ToList();
+                IReadOnlyList<ExcelHeaderMappingDto> mappingsToUse;
+                if (headerMappings == null)
+                {
+                    var headerDetection = _headerDetectionService.DetectHeaders(excelHeaders);
+                    if (!headerDetection.IsValid)
+                    {
+                        result.Erros.Add(
+                            $"Missing or unrecognized required Excel headers: {string.Join(", ", headerDetection.MissingRequiredFields)}.");
+                        return result;
+                    }
+
+                    mappingsToUse = headerDetection.Headers;
+                }
+                else
+                {
+                    if (headerMappings.Any(mapping => mapping == null))
+                    {
+                        result.Erros.Add("The supplied column mapping is invalid.");
+                        return result;
+                    }
+
+                    if (headerMappings.Count != excelHeaders.Count)
+                    {
+                        result.Erros.Add("The supplied column mapping does not match the uploaded workbook.");
+                        return result;
+                    }
+
+                    for (var index = 0; index < headerMappings.Count; index++)
+                    {
+                        if (!string.Equals(
+                            headerMappings[index].ExcelHeader?.Trim(),
+                            excelHeaders[index],
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            result.Erros.Add("The supplied column mapping does not match the uploaded workbook.");
+                            return result;
+                        }
+                    }
+
+                    mappingsToUse = headerMappings;
+                }
+
+                var requiredFields = new[]
                 {
                     "EmployeeCode",
-                    "FirstName",    
+                    "FirstName",
                     "LastName",
                     "Department",
                     "JobTitle",
                     "Salary",
                     "HireDate"
                 };
-
-                //Validate Column Headings
-                for(int i = 0; i < expectedHeaders.Length; i++)
+                var mappedFields = mappingsToUse
+                    .Where(mapping => !string.IsNullOrWhiteSpace(mapping.SuggestedField))
+                    .Select(mapping => mapping.SuggestedField!.Trim())
+                    .ToList();
+                if (mappedFields.Any(field => !requiredFields.Contains(field, StringComparer.OrdinalIgnoreCase)) ||
+                    mappedFields.Distinct(StringComparer.OrdinalIgnoreCase).Count() != mappedFields.Count)
                 {
-                    string actualHeader = worksheet.Cell(1, i + 1).GetString().Trim();
-
-                    if(!string.Equals(actualHeader, expectedHeaders[i],
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        result.Erros.Add(
-                            $"Invalid heading in cloumn {i + 1}. " +
-                            $"Expected : {expectedHeaders[i]}");
-
-                        return (result);
-                    }
+                    result.Erros.Add("Each employee field can be mapped to only one Excel column.");
+                    return result;
                 }
+
+                var missingRequiredFields = requiredFields
+                    .Where(field => !mappedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
+                    .ToList();
+                if (missingRequiredFields.Count > 0)
+                {
+                    result.Erros.Add(
+                        $"Missing required column mappings: {string.Join(", ", missingRequiredFields)}.");
+                    return result;
+                }
+
+                var columnByField = mappingsToUse
+                    .Select((header, index) => new
+                    {
+                        SuggestedField = header.SuggestedField?.Trim(),
+                        Column = index + 1
+                    })
+                    .Where(mapping => mapping.SuggestedField != null)
+                    .ToDictionary(
+                        mapping => mapping.SuggestedField!,
+                        mapping => mapping.Column,
+                        StringComparer.OrdinalIgnoreCase);
 
                 //Read employee records staring from row 2
                 int lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 1;
 
                 for (int row = 2; row <= lastRow; row++)
                 {
-                    string employeeCode = worksheet.Cell(row, 1).GetString().Trim();
-                    string firstName = worksheet.Cell(row, 2).GetString().Trim();
-                    string lastName = worksheet.Cell(row, 3).GetString().Trim();
-                    string department = worksheet.Cell(row, 4).GetString().Trim();
-                    string jobTitle = worksheet.Cell(row, 5).GetString().Trim();
+                    string employeeCode = worksheet.Cell(row, columnByField["EmployeeCode"]).GetString().Trim();
+                    string firstName = worksheet.Cell(row, columnByField["FirstName"]).GetString().Trim();
+                    string lastName = worksheet.Cell(row, columnByField["LastName"]).GetString().Trim();
+                    string department = worksheet.Cell(row, columnByField["Department"]).GetString().Trim();
+                    string jobTitle = worksheet.Cell(row, columnByField["JobTitle"]).GetString().Trim();
 
                     //skip completely empty rows
                     bool isEmptyRow =
@@ -72,8 +148,8 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                         string.IsNullOrWhiteSpace(lastName) &&
                         string.IsNullOrWhiteSpace(department) &&
                         string.IsNullOrWhiteSpace(jobTitle) &&
-                        worksheet.Cell(row, 6).IsEmpty() &&
-                        worksheet.Cell(row, 7).IsEmpty();
+                        worksheet.Cell(row, columnByField["Salary"]).IsEmpty() &&
+                        worksheet.Cell(row, columnByField["HireDate"]).IsEmpty();
 
                     if (isEmptyRow)
                     {
@@ -92,7 +168,7 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                     }
 
                     //Validate salary
-                    if(!worksheet.Cell(row,6).TryGetValue<decimal>(out decimal salary) || salary <= 0)
+                    if(!worksheet.Cell(row, columnByField["Salary"]).TryGetValue<decimal>(out decimal salary) || salary <= 0)
                     {
                         result.Erros.Add(
                               $"Row{row}: Salary must be a valid positive number. "
@@ -101,7 +177,7 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                     }    
                     
                     //Validate hire date
-                    if(!worksheet.Cell(row,7).TryGetValue<DateTime>(out DateTime hireDate))
+                    if(!worksheet.Cell(row, columnByField["HireDate"]).TryGetValue<DateTime>(out DateTime hireDate))
                     {
                         result.Erros.Add(
                             $"Row{row}: HireDate must be a valid Excel date");

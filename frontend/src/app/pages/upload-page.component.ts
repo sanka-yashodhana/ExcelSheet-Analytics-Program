@@ -1,11 +1,13 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AnalyticsApiService, Employee, ImportResult } from '../services/analytics-api.service';
+import { AnalyticsApiService, Employee, ExcelHeaderMapping, ImportResult } from '../services/analytics-api.service';
+
+import { ExcelColumnMappingComponent } from '../components/excel-column-mapping/excel-column-mapping.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ExcelColumnMappingComponent],
   template: `
     <section class="page-heading">
       <div>
@@ -24,34 +26,18 @@ import { AnalyticsApiService, Employee, ImportResult } from '../services/analyti
             <span class="step-chip"><span>01</span> Import</span>
           </div>
 
-          <div class="drop-zone" [class.dragging]="isDragging" (dragover)="onDragOver($event)" (dragleave)="isDragging = false" (drop)="onDrop($event)">
-            <div class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3>Drop your workbook here</h3>
-            <p>or select a file from your device</p>
-            <input #fileInput class="file-input" type="file" accept=".xlsx" (change)="onFileSelected($event)" aria-label="Choose an Excel workbook">
-            <button type="button" class="browse-button" (click)="fileInput.click()">Browse files</button>
-          </div>
-          <p class="file-limit">Excel workbook <b>·</b> .xlsx format <b>·</b> Up to 5 MB</p>
-
-          <div class="selected-file" *ngIf="selectedFile">
-            <span class="file-badge">XLSX</span>
-            <div class="file-info"><strong>{{ selectedFile.name }}</strong><small>{{ formatBytes(selectedFile.size) }} · Ready to scan</small></div>
-            <button class="remove-file" type="button" aria-label="Remove selected file" (click)="reset()" [disabled]="isLoading">×</button>
-          </div>
+          <app-excel-column-mapping
+            [isImporting]="isLoading"
+            [importCompleted]="!!result"
+            (fileChanged)="onWorkbookSelected()"
+            (importRequested)="upload($event)"
+          />
 
           <div class="notice notice-error upload-alert" *ngIf="errors.length">
             <span class="notice-icon"><span>!</span></span><div><strong>We couldn’t import this workbook.</strong><ul><li *ngFor="let error of errors">{{ error }}</li></ul></div>
           </div>
           <div class="loading-panel" *ngIf="isLoading" role="status" aria-live="polite">
-            <span class="spinner"></span><div>Scanning your workbook…<small>Checking columns, validating employee records, and saving data.</small></div>
-          </div>
-
-          <div class="card-actions">
-            <button class="secondary-button" type="button" *ngIf="selectedFile && !isLoading" (click)="reset()">Clear</button>
-            <button class="primary-button" type="button" (click)="upload()" [disabled]="!selectedFile || isLoading">
-              <span *ngIf="!isLoading">{{ result ? 'Import another file' : 'Scan & import' }} <span aria-hidden="true">↗</span></span>
-              <span *ngIf="isLoading">Scanning…</span>
-            </button>
+            <span class="spinner"></span><div>Importing your workbook…<small>Validating mapped columns and saving employee records.</small></div>
           </div>
         </section>
 
@@ -72,7 +58,7 @@ import { AnalyticsApiService, Employee, ImportResult } from '../services/analyti
       <aside class="side-stack">
         <section class="panel guide-card">
           <div class="guide-title"><h2>Workbook checklist</h2><span class="guide-icon">✓</span></div>
-          <p class="guide-intro">Make sure row 1 contains these column names in this exact order.</p>
+          <p class="guide-intro">Map each spreadsheet heading to the employee field it represents before importing.</p>
           <div class="column-list"><span class="column-pill" *ngFor="let column of columns">{{ column }}</span></div>
           <p class="guide-foot">Required fields must be filled. Salary must be positive and HireDate must be a valid Excel date.</p>
         </section>
@@ -88,8 +74,6 @@ import { AnalyticsApiService, Employee, ImportResult } from '../services/analyti
 export class UploadPageComponent {
   private readonly api = inject(AnalyticsApiService);
   readonly columns = ['EmployeeCode', 'FirstName', 'LastName', 'Department', 'JobTitle', 'Salary', 'HireDate'];
-  selectedFile: File | null = null;
-  isDragging = false;
   isLoading = false;
   errors: string[] = [];
   result: ImportResult | null = null;
@@ -97,37 +81,17 @@ export class UploadPageComponent {
   loadedFileName = '';
   isPreviewLoading = false;
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) this.setFile(file);
-    input.value = '';
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragging = true;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragging = false;
-    const file = event.dataTransfer?.files[0];
-    if (file) this.setFile(file);
-  }
-
-  upload(): void {
-    if (!this.selectedFile || this.isLoading) return;
-    const file = this.selectedFile;
+  upload(request: { file: File; headers: ExcelHeaderMapping[] }): void {
+    if (this.isLoading) return;
+    const { file, headers } = request;
     this.errors = [];
     this.result = null;
     this.importedEmployees = [];
     this.isLoading = true;
-    this.api.upload(file).subscribe({
+    this.api.upload(file, headers).subscribe({
       next: (result) => {
         this.result = result;
         this.loadedFileName = result.fileName || file.name;
-        this.selectedFile = null;
         this.isLoading = false;
         this.isPreviewLoading = true;
         this.api.getEmployees().subscribe({
@@ -148,39 +112,15 @@ export class UploadPageComponent {
     });
   }
 
-  reset(): void {
-    this.selectedFile = null;
+  onWorkbookSelected(): void {
     this.errors = [];
     this.result = null;
     this.importedEmployees = [];
     this.loadedFileName = '';
     this.isPreviewLoading = false;
-  }
-
-  formatBytes(bytes: number): string {
-    return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(0)} KB` : `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   }
 
   initials(employee: Employee): string {
     return `${employee.firstName.charAt(0)}${employee.lastName.charAt(0)}`.toUpperCase();
-  }
-
-  private setFile(file: File): void {
-    this.errors = [];
-    this.result = null;
-    this.importedEmployees = [];
-    this.loadedFileName = '';
-    this.isPreviewLoading = false;
-    if (!file.name.toLowerCase().endsWith('.xlsx')) {
-      this.selectedFile = null;
-      this.errors = ['Only .xlsx Excel files are allowed.'];
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      this.selectedFile = null;
-      this.errors = ['File size must not exceed 5 MB.'];
-      return;
-    }
-    this.selectedFile = file;
   }
 }
