@@ -17,6 +17,15 @@ export class EmployeeKpiCards implements OnInit {
   totalDepartments = 0;
   averageSalary = 0;
 
+  get formattedAverageSalary(): string {
+    if (!this.averageSalary || isNaN(this.averageSalary)) {
+      return '0.00';
+    }
+    const parts = this.averageSalary.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return parts.join('.');
+  }
+
   ngOnInit(): void {
 
     this.analyticsService.getAllEmployees().subscribe({
