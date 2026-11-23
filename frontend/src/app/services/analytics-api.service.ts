@@ -54,9 +54,9 @@ export interface ExcelHeaderDetectionResponse {
 @Injectable({ providedIn: "root" })
 export class AnalyticsApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = window.location.origin.includes("localhost")
-    ? "http://localhost:5239/api"
-    : "/api"; // or your production backend domain: 'https://your-api.azurewebsites.net/api'
+  private readonly baseUrl = window.location.port === '4200'
+    ? 'http://localhost:5239/api'
+    : '/api';
 
   upload(
     file: File,
