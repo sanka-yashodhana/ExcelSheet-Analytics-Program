@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using EmployeeExcelAnalytics.Api.DTOs;
 using EmployeeExcelAnalytics.Api.Models;
 using EmployeeExcelAnalytics.Api.Services;
@@ -166,6 +166,14 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                         continue;
                     }
 
+                    // Validate and normalize department to predefined department
+                    if (!PredefinedDepartments.TryNormalize(department, out string normalizedDepartment))
+                    {
+                        result.Erros.Add(
+                            $"Row {row}: Department '{department}' is not recognized. Allowed predefined departments are: {string.Join(", ", PredefinedDepartments.All)}.");
+                        continue;
+                    }
+
                     //Validate salary
                     if(!worksheet.Cell(row, columnByField["Salary"]).TryGetValue<decimal>(out decimal salary) || salary <= 0)
                     {
@@ -183,13 +191,13 @@ namespace EmployeeExcelAnalytics.APi.Srvices
                         continue;
                     }
 
-                    //Create Employee object
+                    //Create Employee object with normalized predefined department
                     var employee = new Employee
                     {
                         EmployeeCode = employeeCode,
                         FirstName = firstName,
                         LastName = lastName,
-                        Department = department,
+                        Department = normalizedDepartment,
                         JobTitle = jobTitle,
                         Salary = salary,
                         HireDate = hireDate

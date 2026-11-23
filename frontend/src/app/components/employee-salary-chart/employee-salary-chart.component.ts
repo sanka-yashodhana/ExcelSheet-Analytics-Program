@@ -15,6 +15,19 @@ export class EmployeeSalaryChart implements OnInit {
 
   private analyticsService = inject(EmployeeAnalyticsServices);
 
+  private readonly chartColors = [
+    '#f59e0b', // Amber / Gold
+    '#f97316', // Orange
+    '#ec4899', // Pink / Magenta
+    '#8b5cf6', // Violet
+    '#06b6d4', // Cyan
+    '#10b981', // Emerald
+    '#6366f1', // Indigo
+    '#14b8a6', // Teal
+    '#e11d48', // Crimson
+    '#eab308'  // Yellow
+  ];
+
   public doughnutChartType: 'doughnut' = 'doughnut';
 
   public doughnutChartData: ChartConfiguration<'doughnut'>['data'] = {
@@ -22,7 +35,7 @@ export class EmployeeSalaryChart implements OnInit {
     datasets: [
       {
         data: [],
-        backgroundColor: ['#a3e635', '#65a30d', '#4ade80', '#22c55e', '#86efac', '#d9f99d'],
+        backgroundColor: this.chartColors,
         borderColor: '#111a14',
         borderWidth: 3
       }
@@ -63,7 +76,7 @@ export class EmployeeSalaryChart implements OnInit {
             {
               label: 'Total Salary',
               data: statistics.map(item => item.totalSalary),
-              backgroundColor: ['#a3e635', '#65a30d', '#4ade80', '#22c55e', '#86efac', '#d9f99d'],
+              backgroundColor: this.chartColors.slice(0, statistics.length),
               borderColor: '#111a14',
               borderWidth: 3
             }

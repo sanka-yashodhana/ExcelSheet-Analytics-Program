@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using EmployeeExcelAnalytics.Api.Data;
 using EmployeeExcelAnalytics.Api.Models;
 
@@ -15,7 +15,9 @@ namespace EmployeeExcelAnalytics.Api.Repositories
 
         public async Task<List<Employee>> GetAllAsync()
         {
-            return await _context.Employees.ToListAsync();
+            return await _context.Employees
+                .Include(employee => employee.ImportHistory)
+                .ToListAsync();
         }
 
         public async Task<List<Employee>> GetByImportHistoryIdAsync(int importHistoryId)

@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AnalyticsApiService, Employee, ExcelHeaderMapping, ImportResult } from '../services/analytics-api.service';
@@ -60,11 +60,11 @@ import { ExcelColumnMappingComponent } from '../components/excel-column-mapping/
           <div class="guide-title"><h2>Workbook checklist</h2><span class="guide-icon">✓</span></div>
           <p class="guide-intro">Map each spreadsheet heading to the employee field it represents before importing.</p>
           <div class="column-list"><span class="column-pill" *ngFor="let column of columns">{{ column }}</span></div>
-          <p class="guide-foot">Required fields must be filled. Salary must be positive and HireDate must be a valid Excel date.</p>
+          <p class="guide-foot">Required fields must be filled. Salary must be positive, HireDate must be a valid date, and Department is standardized into predefined departments (e.g. HR / Human Resources → Human Resources, IT → Information Technology).</p>
         </section>
         <section class="tip-card">
-          <p class="eyebrow">A little heads-up</p><h3>Already in the database? We’ll catch it.</h3>
-          <p>Duplicate employee codes are checked before saving, so you can fix the sheet without creating messy records.</p>
+          <p class="eyebrow">Department standardization</p><h3>Clean charts &amp; database records</h3>
+          <p>Repeating department variations (like "HR" and "HUman resources", or "IT" and "Information Technology") are automatically unified into standard predefined departments.</p>
           <a class="history-link" routerLink="/employees">Explore employee directory <span>→</span></a>
         </section>
       </aside>

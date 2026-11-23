@@ -14,6 +14,32 @@ export class EmployeeDepartmentChartComponent implements OnInit{
       
   private analyticsService = inject(EmployeeAnalyticsServices);
 
+  private readonly barColors = [
+    '#6366f1', // Indigo
+    '#3b82f6', // Blue
+    '#06b6d4', // Cyan
+    '#10b981', // Emerald
+    '#f59e0b', // Amber
+    '#f97316', // Orange
+    '#ec4899', // Pink
+    '#8b5cf6', // Violet
+    '#14b8a6', // Teal
+    '#e11d48'  // Rose
+  ];
+
+  private readonly barBorders = [
+    '#818cf8',
+    '#60a5fa',
+    '#22d3ee',
+    '#34d399',
+    '#fbbf24',
+    '#fb923c',
+    '#f472b6',
+    '#a78bfa',
+    '#2dd4bf',
+    '#f43f5e'
+  ];
+
   public barChartType: 'bar' = 'bar';
 
   public barChartData: ChartConfiguration<'bar'>['data'] = {
@@ -22,9 +48,9 @@ export class EmployeeDepartmentChartComponent implements OnInit{
       {
         label: 'Number of Employees',
         data: [],
-        backgroundColor: 'rgba(163, 230, 53, 0.72)',
-        borderColor: '#a3e635',
-        borderWidth: 1,
+        backgroundColor: this.barColors,
+        borderColor: this.barBorders,
+        borderWidth: 1.5,
         borderRadius: 6
       }
     ]
@@ -34,8 +60,7 @@ export class EmployeeDepartmentChartComponent implements OnInit{
     responsive: true,
     plugins: {
       legend: {
-        display: true,
-        labels: { color: '#c4d2c7' }
+        display: false
       },
       title: {
         display: true,
@@ -61,9 +86,9 @@ export class EmployeeDepartmentChartComponent implements OnInit{
             {
               label: 'Number of Employees',
               data: statistics.map(item => item.employeeCount),
-              backgroundColor: 'rgba(163, 230, 53, 0.72)',
-              borderColor: '#a3e635',
-              borderWidth: 1,
+              backgroundColor: this.barColors.slice(0, statistics.length),
+              borderColor: this.barBorders.slice(0, statistics.length),
+              borderWidth: 1.5,
               borderRadius: 6
             }
           ]

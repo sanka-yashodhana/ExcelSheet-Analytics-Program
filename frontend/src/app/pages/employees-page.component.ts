@@ -1,8 +1,9 @@
-﻿import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AnalyticsApiService, Employee } from '../services/analytics-api.service';
+import { normalizeDepartment } from '../services/employee-analytics.service';
 
 @Component({
   standalone: true,
@@ -11,15 +12,56 @@ import { AnalyticsApiService, Employee } from '../services/analytics-api.service
     <section class="page-heading">
       <div><p class="eyebrow">Your people at a glance</p><h1>Employee directory</h1><p>Every imported employee, together in one place.</p></div>
       <div class="heading-actions">
+        <button class="secondary-button" type="button" *ngIf="employees.length" [disabled]="isExporting" (click)="exportToExcel()">
+          <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          {{ isExporting ? 'Exporting…' : 'Export .xlsx' }}
+        </button>
         <button class="danger-button" type="button" *ngIf="employees.length" [disabled]="isDeleting" (click)="deleteAllEmployees()">{{ isDeleting ? 'Deleting…' : 'Delete all employee data' }}</button>
         <a class="primary-button" routerLink="/"> Import a workbook</a>
       </div>
     </section>
 
     <div class="directory-stats">
-      <section class="panel metric-card"><span class="metric-icon">♙</span><div><span>Total employees</span><strong>{{ employees.length }}</strong></div></section>
-      <section class="panel metric-card"><span class="metric-icon green">▦</span><div><span>Departments</span><strong>{{ departmentCount }}</strong></div></section>
-      <section class="panel metric-card"><span class="metric-icon blue">↗</span><div><span>Showing records</span><strong>{{ filteredEmployees.length }}</strong></div></section>
+      <section class="panel metric-card">
+        <span class="metric-icon">
+          <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <div><span>Total employees</span><strong>{{ employees.length }}</strong></div>
+      </section>
+
+      <section class="panel metric-card">
+        <span class="metric-icon">
+          <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+            <path d="M9 22v-4h6v4"/>
+            <path d="M8 6h.01"/>
+            <path d="M16 6h.01"/>
+            <path d="M8 10h.01"/>
+            <path d="M16 10h.01"/>
+            <path d="M8 14h.01"/>
+            <path d="M16 14h.01"/>
+          </svg>
+        </span>
+        <div><span>Departments</span><strong>{{ departmentCount }}</strong></div>
+      </section>
+
+      <section class="panel metric-card">
+        <span class="metric-icon">
+          <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </span>
+        <div><span>Showing records</span><strong>{{ filteredEmployees.length }}</strong></div>
+      </section>
     </div>
 
     <div class="notice notice-success delete-notice" *ngIf="deleteMessage"><span class="notice-icon"><span>✓</span></span>{{ deleteMessage }}</div>
@@ -62,6 +104,29 @@ export class EmployeesPageComponent implements OnInit {
   searchTerm = '';
   errors: string[] = [];
   deleteMessage = '';
+  isExporting = false;
+
+  exportToExcel(): void {
+    if (this.isExporting) return;
+    this.isExporting = true;
+    this.api.downloadEmployeesWorkbook().subscribe({
+      next: (blob: Blob) => {
+        this.isExporting = false;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.download = 'employees_export.xlsx';
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err: unknown) => {
+        this.isExporting = false;
+        alert('Failed to export employee records: ' + this.api.getErrorMessages(err).join(' '));
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.api.getEmployees().subscribe({
@@ -77,7 +142,11 @@ export class EmployeesPageComponent implements OnInit {
   }
 
   get departmentCount(): number {
-    return new Set(this.employees.map(employee => employee.department)).size;
+    return new Set(
+      this.employees
+        .map(employee => normalizeDepartment(employee.department))
+        .filter((dept): dept is string => !!dept)
+    ).size;
   }
 
   initials(employee: Employee): string {

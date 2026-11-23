@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { Injectable, inject } from "@angular/core";
+import { Observable } from "rxjs";
 
 export interface Employee {
   id: number;
@@ -51,21 +51,32 @@ export interface ExcelHeaderDetectionResponse {
   missingRequiredFields: string[];
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class AnalyticsApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:5239/api';
+  private readonly baseUrl = window.location.origin.includes("localhost")
+    ? "http://localhost:5239/api"
+    : "/api"; // or your production backend domain: 'https://your-api.azurewebsites.net/api'
 
-  upload(file: File, headerMappings: ExcelHeaderMapping[]): Observable<ImportResult> {
+  upload(
+    file: File,
+    headerMappings: ExcelHeaderMapping[],
+  ): Observable<ImportResult> {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('headerMappings', JSON.stringify(headerMappings));
-    return this.http.post<ImportResult>(`${this.baseUrl}/ExcelImport/upload`, formData);
+    formData.append("file", file);
+    formData.append("headerMappings", JSON.stringify(headerMappings));
+    return this.http.post<ImportResult>(
+      `${this.baseUrl}/ExcelImport/upload`,
+      formData,
+    );
   }
 
   getEmployees(importHistoryId?: number): Observable<Employee[]> {
     const url = `${this.baseUrl}/Employees`;
-    return this.http.get<Employee[]>(url, importHistoryId === undefined ? {} : { params: { importHistoryId } });
+    return this.http.get<Employee[]>(
+      url,
+      importHistoryId === undefined ? {} : { params: { importHistoryId } },
+    );
   }
 
   getImportHistories(): Observable<ImportHistory[]> {
@@ -78,35 +89,49 @@ export class AnalyticsApiService {
 
   getErrorMessages(error: unknown): string[] {
     if (!(error instanceof HttpErrorResponse)) {
-      return ['Something went wrong. Please try again.'];
+      return ["Something went wrong. Please try again."];
     }
 
     const body: unknown = error.error;
-    if (typeof body === 'object' && body !== null) {
+    if (typeof body === "object" && body !== null) {
       const details = body as { message?: unknown; errors?: unknown };
       if (Array.isArray(details.errors)) {
-        const messages = details.errors.filter((item): item is string => typeof item === 'string');
+        const messages = details.errors.filter(
+          (item): item is string => typeof item === "string",
+        );
         if (messages.length) return messages;
       }
-      if (typeof details.message === 'string') return [details.message];
+      if (typeof details.message === "string") return [details.message];
     }
 
     if (error.status === 0) {
-      return ['Could not reach the API. Make sure the .NET backend is running at http://localhost:5239.'];
+      return [
+        "Could not reach the API. Make sure the .NET backend is running at http://localhost:5239.",
+      ];
     }
-    return [error.message || 'The request could not be completed.'];
+    return [error.message || "The request could not be completed."];
   }
 
   // Detect Excel headers
-detectHeaders(file: File): Observable<ExcelHeaderDetectionResponse> {
+  detectHeaders(file: File): Observable<ExcelHeaderDetectionResponse> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return this.http.post<ExcelHeaderDetectionResponse>(
+      `${this.baseUrl}/ExcelImport/detect-headers`,
+      formData,
+    );
+  }
 
-  const formData = new FormData();
+  downloadImportHistoryWorkbook(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/ImportHistories/${id}/download`, {
+      responseType: "blob",
+    });
+  }
 
-  formData.append('file', file);
-
-  return this.http.post<ExcelHeaderDetectionResponse>(
-    `${this.baseUrl}/ExcelImport/detect-headers`,
-    formData
-  );
-}
+  downloadEmployeesWorkbook(importHistoryId?: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/Employees/download`, {
+      params: importHistoryId !== undefined ? { importHistoryId } : {},
+      responseType: "blob",
+    });
+  }
 }

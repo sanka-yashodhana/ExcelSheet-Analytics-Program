@@ -413,14 +413,108 @@ body {
   background: #111a14;
 }
 
-.metric-icon {
-  background: #26351e;
-  color: #c4f27b;
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  background: #111a14;
+  border: 1px solid #29382e;
+  border-radius: 14px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.metric-icon.blue {
-  background: #1b3028;
-  color: #8de2b5;
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: #3f5544;
+}
+
+.metric-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #1b2c1f, #152419);
+  border: 1px solid #2e4432;
+  color: #a3e635;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.metric-svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.table-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #2e4432;
+  background: #152219;
+  color: #a3e635;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.table-action-button:hover:not(:disabled) {
+  background: #1d2f22;
+  border-color: #4c6f52;
+  color: #bef264;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.table-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.detail-action {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.detail-file-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #1b2c1f, #152419);
+  border: 1px solid #2e4432;
+  color: #a3e635;
 }
 
 .table-toolbar,
@@ -566,6 +660,7 @@ body {
   padding: 18px 20px 20px;
   border-radius: 15px;
   background: linear-gradient(145deg, #121b15, #0f1712);
+  border: 1px solid #25342a;
 }
 
 .chart-card-wide {

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { EmployeeAnalyticsServices } from 'src/app/services/employee-analytics.service';
+import { EmployeeAnalyticsServices, normalizeDepartment } from 'src/app/services/employee-analytics.service';
 import { Employee } from 'src/app/services/analytics-api.service';
 
 @Component({
@@ -25,9 +25,11 @@ export class EmployeeKpiCards implements OnInit {
 
         this.totalEmployees = employees.length;
 
-        this.totalDepartments = new Set(
-          employees.map(employee => employee.department)
-        ).size;
+        const validDepartments = employees
+          .map(employee => normalizeDepartment(employee.department))
+          .filter((dept): dept is string => !!dept);
+
+        this.totalDepartments = new Set(validDepartments).size;
 
         this.averageSalary = employees.length > 0
           ? employees.reduce((total, employee) => total + employee.salary, 0)

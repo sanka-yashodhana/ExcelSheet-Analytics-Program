@@ -5,7 +5,6 @@ using EmployeeExcelAnalytics.APi.Srvices;
 using EmployeeExcelAnalytics.Services;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Repository Registration
@@ -25,9 +24,9 @@ builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularFrontend", policy =>
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+        policy.WithOrigins("http://localhost:4200", "https://your-production-app.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -66,5 +65,39 @@ app.MapGet("/api/database-test", async (AppDbContext context) =>
 
     return Results.Problem("Database connection failed.");
 });
+
+app.MapGet("/api/departments", () => Results.Ok(PredefinedDepartments.All));
+
+// Normalize any existing employee records in the database to predefined departments
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (db.Database.CanConnect())
+        {
+            var employees = db.Employees.ToList();
+            bool hasModifications = false;
+            foreach (var employee in employees)
+            {
+                if (PredefinedDepartments.TryNormalize(employee.Department, out var normalizedDept) &&
+                    employee.Department != normalizedDept)
+                {
+                    employee.Department = normalizedDept;
+                    hasModifications = true;
+                }
+            }
+
+            if (hasModifications)
+            {
+                db.SaveChanges();
+            }
+        }
+    }
+    catch
+    {
+        // Safe fallback if database is unavailable at startup
+    }
+}
 
 app.Run();

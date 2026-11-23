@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -23,5 +23,9 @@
   <ItemGroup>
     <Folder Include="Middleware\" />
   </ItemGroup>
+
+  <Target Name="AutoStopProcessBeforeBuild" BeforeTargets="BeforeBuild">
+    <Exec Command="taskkill /F /IM EmployeeExcelAnalytics.exe 2&gt;nul || exit 0" ContinueOnError="true" />
+  </Target>
 
 </Project>

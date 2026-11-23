@@ -15,6 +15,19 @@ export class EmployeeDepartmentPieChart implements OnInit {
 
   private analyticsService = inject(EmployeeAnalyticsServices);
 
+  private readonly chartColors = [
+    '#38bdf8', // Sky Blue
+    '#818cf8', // Indigo
+    '#c084fc', // Purple
+    '#f472b6', // Pink
+    '#fb7185', // Rose
+    '#fb923c', // Orange
+    '#facc15', // Yellow
+    '#4ade80', // Mint Green
+    '#2dd4bf', // Teal
+    '#94a3b8'  // Slate
+  ];
+
   public pieChartType: 'pie' = 'pie';
 
   public pieChartData: ChartConfiguration<'pie'>['data'] = {
@@ -22,7 +35,7 @@ export class EmployeeDepartmentPieChart implements OnInit {
     datasets: [
       {
         data: [],
-        backgroundColor: ['#a3e635', '#65a30d', '#4ade80', '#22c55e', '#86efac', '#d9f99d'],
+        backgroundColor: this.chartColors,
         borderColor: '#111a14',
         borderWidth: 3
       }
@@ -55,7 +68,7 @@ export class EmployeeDepartmentPieChart implements OnInit {
           datasets: [
             {
               data: statistics.map(item => item.employeeCount),
-              backgroundColor: ['#a3e635', '#65a30d', '#4ade80', '#22c55e', '#86efac', '#d9f99d'],
+              backgroundColor: this.chartColors.slice(0, statistics.length),
               borderColor: '#111a14',
               borderWidth: 3
             }
