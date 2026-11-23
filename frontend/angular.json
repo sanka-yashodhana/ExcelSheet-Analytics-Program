@@ -19,7 +19,7 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "styles": ["src/styles.css"],
-            "assets": []
+            "assets": ["src/assets"]
           },
           "configurations": {
             "production": {

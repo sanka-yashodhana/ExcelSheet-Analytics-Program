@@ -9,6 +9,25 @@ import { filter } from 'rxjs/operators';
   imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
   template: `
     <div class="app-shell">
+      <!-- App Opening Automatic Splash Screen -->
+      <div class="app-loading-splash" *ngIf="showSplash" [class.fade-out]="isSplashFading" aria-hidden="true">
+        <div class="splash-card">
+          <div class="splash-logo-container">
+            <img src="/assets/excel-3d-logo.png" alt="Excel 3D Logo" class="splash-excel-img" />
+            <div class="splash-ring"></div>
+            <div class="splash-glow"></div>
+          </div>
+          <div class="splash-brand">
+            <span class="brand-mark"><span></span><span></span><span></span><span></span></span>
+            <h1>sheetwise<span class="brand-dot">.</span></h1>
+          </div>
+          <p class="splash-subtitle">Workforce Intelligence &amp; Analytics</p>
+          <div class="splash-progress">
+            <div class="splash-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
       <header class="topbar">
         <button
           class="mobile-menu-toggle"
@@ -132,6 +151,8 @@ import { filter } from 'rxjs/operators';
 })
 export class AppComponent {
   isSidebarOpen = false;
+  showSplash = true;
+  isSplashFading = false;
 
   constructor(private router: Router) {
     this.router.events.pipe(
@@ -139,6 +160,14 @@ export class AppComponent {
     ).subscribe(() => {
       this.isSidebarOpen = false;
     });
+
+    // Automatically transition splash screen on initial app load
+    setTimeout(() => {
+      this.isSplashFading = true;
+      setTimeout(() => {
+        this.showSplash = false;
+      }, 500);
+    }, 1800);
   }
 
   toggleSidebar(): void {

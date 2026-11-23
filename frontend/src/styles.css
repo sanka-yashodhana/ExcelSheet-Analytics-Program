@@ -1077,3 +1077,361 @@ body {
     padding: 14px 16px;
   }
 }
+
+/* ============================================================
+   App Automatic Loading Splash Screen (with 3D Excel Logo)
+   ============================================================ */
+.app-loading-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #080d0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s ease;
+}
+
+.app-loading-splash.fade-out {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.splash-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 380px;
+  animation: splashZoomIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes splashZoomIn {
+  from {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.splash-logo-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.splash-excel-img {
+  width: 110px;
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.6));
+  animation: floatExcel 2.8s ease-in-out infinite;
+}
+
+@keyframes floatExcel {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-1.5deg);
+  }
+}
+
+.splash-glow {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.28) 0%, rgba(16, 185, 129, 0.08) 60%, transparent 80%);
+  filter: blur(14px);
+  z-index: 1;
+  animation: pulseGlow 2.8s infinite;
+}
+
+.splash-ring {
+  position: absolute;
+  width: 136px;
+  height: 136px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(163, 230, 53, 0.25);
+  animation: spinRing 16s linear infinite;
+  z-index: 1;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.splash-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.splash-brand h1 {
+  margin: 0;
+  color: #edf7ef;
+  font: 800 28px Manrope, sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.splash-subtitle {
+  margin: 0 0 24px;
+  color: #8ca291;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.splash-progress {
+  width: 160px;
+  height: 4px;
+  background: #16241a;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #233527;
+}
+
+.splash-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #65a30d, #a3e635, #bef264);
+  border-radius: 999px;
+  animation: progressFill 1.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes progressFill {
+  0% { width: 0%; }
+  60% { width: 75%; }
+  100% { width: 100%; }
+}
+
+/* ============================================================
+   Home Page Hero Banner (Directly Under Navbar)
+   ============================================================ */
+.home-hero-banner {
+  background: linear-gradient(135deg, #101a13 0%, #0b130e 100%);
+  border: 1px solid #243729;
+  border-radius: 18px;
+  padding: 30px 36px;
+  margin-bottom: 28px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+  position: relative;
+  overflow: hidden;
+}
+
+.home-hero-banner::after {
+  content: '';
+  position: absolute;
+  right: -50px;
+  top: -50px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.hero-text-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #a3e635;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hero-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a3e635;
+  box-shadow: 0 0 10px rgba(163, 230, 53, 0.7);
+  animation: pulseGlow 1.8s infinite;
+}
+
+.hero-text-col h1 {
+  margin: 0 0 10px;
+  color: #edf7ef;
+  font: 800 clamp(24px, 3.2vw, 34px)/1.2 Manrope, sans-serif;
+  letter-spacing: -0.6px;
+}
+
+.hero-text-col p {
+  margin: 0 0 20px;
+  color: #94a797;
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 620px;
+}
+
+.hero-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #142218;
+  border: 1px solid #283d2d;
+  color: #c9e89f;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.hero-pill:hover {
+  background: #1c2e21;
+  border-color: #3f5d44;
+  color: #d9f99d;
+}
+
+.hero-art-col {
+  flex-shrink: 0;
+}
+
+.hero-art-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-3d-asset {
+  width: 125px;
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.5));
+  animation: floatExcel 3s ease-in-out infinite;
+}
+
+.hero-art-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.22) 0%, transparent 70%);
+  filter: blur(16px);
+  z-index: 1;
+}
+
+/* ============================================================
+   Home Page Sidebar 3D Excel Showcase Card
+   ============================================================ */
+.excel-showcase-card {
+  background: #111a14;
+  border: 1px solid #29382e;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+  transition: border-color 0.2s ease;
+}
+
+.excel-showcase-card:hover {
+  border-color: #3f5544;
+}
+
+.excel-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.excel-mini-logo {
+  width: 46px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+.excel-card-header h3 {
+  margin: 0;
+  color: #edf7ef;
+  font: 700 15px Manrope, sans-serif;
+}
+
+.excel-card-header span {
+  display: block;
+  margin-top: 3px;
+  color: #a3e635;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.excel-card-desc {
+  margin: 0;
+  color: #92a496;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Responsive adjustments for Home Hero Banner */
+@media (max-width: 768px) {
+  .home-hero-banner {
+    padding: 22px 18px;
+    margin-bottom: 22px;
+  }
+
+  .hero-banner-inner {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .hero-text-col p {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .hero-badge-row {
+    justify-content: center;
+  }
+
+  .hero-3d-asset {
+    width: 100px;
+  }
+
+  .hero-art-container {
+    width: 110px;
+    height: 110px;
+  }
+}

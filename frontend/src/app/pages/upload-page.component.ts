@@ -9,13 +9,28 @@ import { ExcelColumnMappingComponent } from '../components/excel-column-mapping/
   standalone: true,
   imports: [CommonModule, RouterLink, ExcelColumnMappingComponent],
   template: `
-    <section class="page-heading">
-      <div>
-        <p class="eyebrow">Employee data, made simple</p>
-        <h1>Bring your spreadsheet<br class="mobile-break"> to life.</h1>
-        <p>Upload an employee workbook and turn rows into insight.</p>
+    <!-- Home Page Hero Banner Under Navbar with 3D Excel Asset -->
+    <section class="home-hero-banner">
+      <div class="hero-banner-inner">
+        <div class="hero-text-col">
+          <div class="hero-eyebrow">
+            <span class="hero-live-dot"></span> EXCEL WORKBOOK ENGINE
+          </div>
+          <h1>Bring your spreadsheets to life.</h1>
+          <p>Scan headers automatically, map columns with precision, and transform raw employee rows into clean, actionable workforce insights.</p>
+          <div class="hero-badge-row">
+            <span class="hero-pill">✓ Automatic Header Detection</span>
+            <span class="hero-pill">✓ Department Normalization</span>
+            <span class="hero-pill">✓ Live Analytics &amp; Charts</span>
+          </div>
+        </div>
+        <div class="hero-art-col">
+          <div class="hero-art-container">
+            <img src="/assets/excel-3d-logo.png" alt="Excel 3D Spreadsheet" class="hero-3d-asset" />
+            <div class="hero-art-glow"></div>
+          </div>
+        </div>
       </div>
-      <span class="soft-label"><i></i> Secure workspace</span>
     </section>
 
     <div class="import-layout">
@@ -56,6 +71,18 @@ import { ExcelColumnMappingComponent } from '../components/excel-column-mapping/
       </div>
 
       <aside class="side-stack">
+        <!-- 3D Excel Feature Card -->
+        <section class="panel excel-showcase-card">
+          <div class="excel-card-header">
+            <img src="/assets/excel-3d-logo.png" alt="Excel Logo" class="excel-mini-logo" />
+            <div>
+              <h3>Excel Ingestion Engine</h3>
+              <span>XLSX &bull; Multi-sheet ready</span>
+            </div>
+          </div>
+          <p class="excel-card-desc">Upload any employee spreadsheet to automatically map columns, detect hire dates, and standardize departments.</p>
+        </section>
+
         <section class="panel guide-card">
           <div class="guide-title"><h2>Workbook checklist</h2><span class="guide-icon">✓</span></div>
           <p class="guide-intro">Map each spreadsheet heading to the employee field it represents before importing.</p>
@@ -73,6 +100,7 @@ import { ExcelColumnMappingComponent } from '../components/excel-column-mapping/
 })
 export class UploadPageComponent {
   private readonly api = inject(AnalyticsApiService);
+
   readonly columns = ['EmployeeCode', 'FirstName', 'LastName', 'Department', 'JobTitle', 'Salary', 'HireDate'];
   isLoading = false;
   errors: string[] = [];
@@ -124,3 +152,4 @@ export class UploadPageComponent {
     return `${employee.firstName.charAt(0)}${employee.lastName.charAt(0)}`.toUpperCase();
   }
 }
+
