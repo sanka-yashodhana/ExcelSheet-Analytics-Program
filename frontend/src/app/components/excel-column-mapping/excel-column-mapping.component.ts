@@ -1,5 +1,4 @@
-
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -16,7 +15,7 @@ import {
   templateUrl: './excel-column-mapping.component.html',
   styleUrl: './excel-column-mapping.component.css'
 })
-export class ExcelColumnMappingComponent {
+export class ExcelColumnMappingComponent implements OnInit {
 
   private excelImportService = inject(AnalyticsApiService);
 
@@ -32,6 +31,9 @@ export class ExcelColumnMappingComponent {
 
   selectedFile: File | null = null;
   isDragging = false;
+
+  maxFileSizeMB = 100;
+  maxRecords = 500000;
 
   headers: ExcelHeaderMapping[] = [];
 
@@ -52,6 +54,18 @@ export class ExcelColumnMappingComponent {
   errorMessage = '';
 
   successMessage = '';
+
+  ngOnInit(): void {
+    this.excelImportService.getImportConfig().subscribe({
+      next: (config) => {
+        if (config.maxFileSizeMB > 0) this.maxFileSizeMB = config.maxFileSizeMB;
+        if (config.maxRecords > 0) this.maxRecords = config.maxRecords;
+      },
+      error: () => {
+        // Fallback to configured defaults if offline
+      }
+    });
+  }
 
   // Select Excel file
   onFileSelected(event: Event): void {
@@ -98,6 +112,12 @@ export class ExcelColumnMappingComponent {
     });
   }
 
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
   private setFile(file: File): void {
     this.errorMessage = '';
     this.successMessage = '';
@@ -111,9 +131,10 @@ export class ExcelColumnMappingComponent {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    const maxBytes = this.maxFileSizeMB * 1024 * 1024;
+    if (file.size > maxBytes) {
       this.selectedFile = null;
-      this.errorMessage = 'File size must not exceed 5 MB.';
+      this.errorMessage = `File size must not exceed ${this.maxFileSizeMB} MB.`;
       return;
     }
 

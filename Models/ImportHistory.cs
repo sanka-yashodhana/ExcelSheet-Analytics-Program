@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeExcelAnalytics.Api.Models
 {
@@ -13,8 +13,20 @@ namespace EmployeeExcelAnalytics.Api.Models
 
         public int TotalRows { get; set; }
 
+        public int ProcessedRows { get; set; }
+
+        public int ImportedRows { get; set; }
+
+        public int RejectedRows { get; set; }
+
         [Required]
         public string Status { get; set; } = string.Empty;
+
+        public string? ErrorReportPath { get; set; }
+
+        public string? JobId { get; set; }
+
+        public string? ErrorMessage { get; set; }
 
         // Navigation Property
         public ICollection<Employee> Employees { get; set; }

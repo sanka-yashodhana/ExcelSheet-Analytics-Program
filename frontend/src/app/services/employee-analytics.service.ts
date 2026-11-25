@@ -1,8 +1,11 @@
 import { Injectable, inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
 import { map, Observable } from "rxjs";
 
-import { Employee } from "./analytics-api.service";
+import {
+  AnalyticsApiService,
+  Employee,
+  EmployeeAnalyticsSummary,
+} from "./analytics-api.service";
 
 export const PREDEFINED_DEPARTMENTS: readonly string[] = [
   "Human Resources",
@@ -229,84 +232,31 @@ export interface HiringTrendStatistic {
   providedIn: "root",
 })
 export class EmployeeAnalyticsServices {
-  private http = inject(HttpClient);
-  //private apiUrl = 'http://localhost:5239/api/Employees';
+  private readonly api = inject(AnalyticsApiService);
 
-  private apiUrl = window.location.origin.includes("localhost")
-    ? "http://localhost:5239/api/Employees"
-    : "/api"; // or your production  backend domain: 'https://your-api.azurewebsites.net/api'
+  getAnalyticsSummary(): Observable<EmployeeAnalyticsSummary> {
+    return this.api.getAnalyticsSummary();
+  }
 
   getEmployeeByDepartment(): Observable<DepartmentStatistic[]> {
-    return this.getAllEmployees().pipe(
-      map((employees) => {
-        const departmentCounts = new Map<string, number>();
-
-        employees.forEach((employee) => {
-          const department = normalizeDepartment(employee.department);
-
-          // Only add predefined departments into charts
-          if (!department || !PREDEFINED_DEPARTMENTS.includes(department)) {
-            return;
-          }
-
-          const currentCount = departmentCounts.get(department) || 0;
-          departmentCounts.set(department, currentCount + 1);
-        });
-
-        return Array.from(departmentCounts, ([department, employeeCount]) => ({
-          department,
-          employeeCount,
-        })).sort((a, b) => b.employeeCount - a.employeeCount);
-      }),
-    );
+    return this.api
+      .getAnalyticsSummary()
+      .pipe(map((summary) => summary.byDepartment));
   }
 
   getAllEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(this.apiUrl);
+    return this.api.getEmployees();
   }
 
   getSalaryByDepartment(): Observable<DepartmentSalaryStatistic[]> {
-    return this.getAllEmployees().pipe(
-      map((employees) => {
-        const salaryTotals = new Map<string, number>();
-
-        employees.forEach((employee) => {
-          const department = normalizeDepartment(employee.department);
-
-          // Only add predefined departments into charts
-          if (!department || !PREDEFINED_DEPARTMENTS.includes(department)) {
-            return;
-          }
-
-          const currentTotal = salaryTotals.get(department) || 0;
-          salaryTotals.set(department, currentTotal + employee.salary);
-        });
-
-        return Array.from(salaryTotals, ([department, totalSalary]) => ({
-          department,
-          totalSalary,
-        })).sort((a, b) => b.totalSalary - a.totalSalary);
-      }),
-    );
+    return this.api
+      .getAnalyticsSummary()
+      .pipe(map((summary) => summary.salaryByDepartment));
   }
 
   getHiringTrends(): Observable<HiringTrendStatistic[]> {
-    return this.getAllEmployees().pipe(
-      map((employees) => {
-        const hiringCounts = new Map<number, number>();
-
-        employees.forEach((employee) => {
-          const year = new Date(employee.hireDate).getFullYear();
-          if (isNaN(year)) return;
-          const currentCount = hiringCounts.get(year) || 0;
-          hiringCounts.set(year, currentCount + 1);
-        });
-
-        return Array.from(hiringCounts, ([year, employeeCount]) => ({
-          year,
-          employeeCount,
-        })).sort((a, b) => a.year - b.year);
-      }),
-    );
+    return this.api
+      .getAnalyticsSummary()
+      .pipe(map((summary) => summary.hiringTrends));
   }
 }

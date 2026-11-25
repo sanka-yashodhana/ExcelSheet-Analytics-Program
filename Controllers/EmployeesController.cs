@@ -46,6 +46,42 @@ namespace EmployeeExcelAnalytics.Api.Controllers
             return Ok(response);
         }
 
+        // GET: api/employees/paged
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPagedEmployees(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 25,
+            [FromQuery] string? search = null,
+            [FromQuery] string? department = null,
+            [FromQuery] int? importHistoryId = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? sortDir = null)
+        {
+            if (importHistoryId.HasValue && importHistoryId.Value <= 0)
+            {
+                return BadRequest(new { message = "Import history ID must be a positive number." });
+            }
+
+            var paged = await _employeeService.GetPagedEmployeesAsync(
+                page,
+                pageSize,
+                search,
+                department,
+                importHistoryId,
+                sortBy,
+                sortDir);
+
+            return Ok(paged);
+        }
+
+        // GET: api/employees/analytics
+        [HttpGet("analytics")]
+        public async Task<IActionResult> GetAnalyticsSummary()
+        {
+            var summary = await _employeeService.GetAnalyticsSummaryAsync();
+            return Ok(summary);
+        }
+
         [HttpDelete]
         public async Task<IActionResult> DeleteAllEmployees()
         {
@@ -83,6 +119,7 @@ namespace EmployeeExcelAnalytics.Api.Controllers
             headerRange.Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
 
             int row = 2;
+            bool formatIndividualSalaryCells = employees.Count <= 5000;
             foreach (var employee in employees.OrderBy(e => e.Id))
             {
                 worksheet.Cell(row, 1).Value = employee.EmployeeCode;
@@ -91,12 +128,28 @@ namespace EmployeeExcelAnalytics.Api.Controllers
                 worksheet.Cell(row, 4).Value = employee.Department;
                 worksheet.Cell(row, 5).Value = employee.JobTitle;
                 worksheet.Cell(row, 6).Value = employee.Salary;
-                worksheet.Cell(row, 6).Style.NumberFormat.Format = "$#,##0.00";
+                if (formatIndividualSalaryCells)
+                {
+                    worksheet.Cell(row, 6).Style.NumberFormat.Format = "$#,##0.00";
+                }
                 worksheet.Cell(row, 7).Value = employee.HireDate.ToString("yyyy-MM-dd");
                 row++;
             }
 
-            worksheet.Columns().AdjustToContents();
+            if (employees.Count <= 2000)
+            {
+                worksheet.Columns().AdjustToContents();
+            }
+            else
+            {
+                worksheet.Column(1).Width = 16;
+                worksheet.Column(2).Width = 18;
+                worksheet.Column(3).Width = 18;
+                worksheet.Column(4).Width = 24;
+                worksheet.Column(5).Width = 24;
+                worksheet.Column(6).Width = 15;
+                worksheet.Column(7).Width = 14;
+            }
 
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);

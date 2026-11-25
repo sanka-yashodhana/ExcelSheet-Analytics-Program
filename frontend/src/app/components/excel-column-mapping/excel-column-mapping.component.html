@@ -26,13 +26,13 @@
       {{ selectedFile ? 'Choose another file' : 'Browse files' }}
     </button>
   </div>
-  <p class="file-limit">Excel workbook <b>·</b> .xlsx format <b>·</b> Up to 5 MB</p>
+  <p class="file-limit">Excel workbook <b>·</b> .xlsx format <b>·</b> Up to {{ maxFileSizeMB }} MB <b>·</b> Up to {{ maxRecords | number }} records</p>
 
   <div class="selected-file" *ngIf="selectedFile">
     <span class="file-badge">XLSX</span>
     <div class="file-info">
       <strong>{{ selectedFile.name }}</strong>
-      <small>{{ isLoading ? 'Detecting headers…' : 'Ready to map' }}</small>
+      <small>{{ formatFileSize(selectedFile.size) }} · {{ isLoading ? 'Detecting headers…' : 'Ready to map' }}</small>
     </div>
     <button class="remove-file" type="button" aria-label="Remove selected file" (click)="clearFile()" [disabled]="isImporting">×</button>
   </div>

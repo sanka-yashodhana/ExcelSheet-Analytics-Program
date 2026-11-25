@@ -1,4 +1,5 @@
 using EmployeeExcelAnalytics.Api.Data;
+using EmployeeExcelAnalytics.Api.Options;
 using EmployeeExcelAnalytics.Api.Repositories;
 using EmployeeExcelAnalytics.Api.Services;
 using EmployeeExcelAnalytics.APi.Srvices;
@@ -7,14 +8,36 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Excel Import limits
+builder.Services.Configure<ExcelImportOptions>(builder.Configuration.GetSection("ExcelImport"));
+var maxFileSizeMb = builder.Configuration.GetValue<long?>("ExcelImport:MaxFileSizeMB") ?? 100;
+var maxRequestBytes = (maxFileSizeMb * 1024L * 1024L) + (2L * 1024L * 1024L);
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = maxRequestBytes;
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = maxRequestBytes;
+});
+
 // Repository Registration
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
-//Service Registration
+// Service Registration
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IExcelImportService, ExcelImportService>();
 builder.Services.AddScoped<IEmployeeImportService, EmployeeImportService>();
 builder.Services.AddScoped<ExcelHeaderDetectionService>();
+builder.Services.AddScoped<StreamingExcelReader>();
+
+// Large Dataset Import Background Worker & Job Infrastructure
+builder.Services.AddSingleton<IImportJobStore, ImportJobStore>();
+builder.Services.AddSingleton<IImportJobQueue, ImportJobQueue>();
+builder.Services.AddScoped<ILargeExcelImportProcessor, LargeExcelImportProcessor>();
+builder.Services.AddHostedService<LargeExcelImportWorker>();
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -27,11 +50,6 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:4200", "https://your-production-app.com")
               .AllowAnyHeader()
               .AllowAnyMethod());
-});
-
-builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 104_857_600; // 100 MB
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -66,6 +84,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.Map("/api/{**catchAll}", () => Results.NotFound(new { message = "API endpoint not found." }));
+
 app.MapFallbackToFile("index.html");
 
 app.MapGet("/api/database-test", async (AppDbContext context) =>
@@ -85,7 +105,7 @@ app.MapGet("/api/database-test", async (AppDbContext context) =>
 
 app.MapGet("/api/departments", () => Results.Ok(PredefinedDepartments.All));
 
-// Normalize any existing employee records in the database to predefined departments
+// Ensure large-import schema columns/indexes exist and normalize any legacy non-standard departments efficiently
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -93,9 +113,14 @@ using (var scope = app.Services.CreateScope())
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         if (db.Database.CanConnect())
         {
-            var employees = db.Employees.ToList();
+            DatabaseSchemaInitializer.EnsureSchemaAndIndexes(db);
+
+            var unnormalizedEmployees = db.Employees
+                .Where(e => !PredefinedDepartments.All.Contains(e.Department))
+                .ToList();
+
             bool hasModifications = false;
-            foreach (var employee in employees)
+            foreach (var employee in unnormalizedEmployees)
             {
                 if (PredefinedDepartments.TryNormalize(employee.Department, out var normalizedDept) &&
                     employee.Department != normalizedDept)

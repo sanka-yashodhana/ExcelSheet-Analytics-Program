@@ -487,6 +487,18 @@ body {
   cursor: not-allowed;
 }
 
+.table-action-danger-button {
+  border-color: #663b35;
+  background: #211513;
+  color: #ffaaa0;
+}
+
+.table-action-danger-button:hover:not(:disabled) {
+  border-color: #ef4444;
+  background: #321b18;
+  color: #fecaca;
+}
+
 .btn-svg {
   width: 14px;
   height: 14px;
@@ -1433,5 +1445,334 @@ body {
   .hero-art-container {
     width: 110px;
     height: 110px;
+  }
+}
+
+/* ============================================================
+   Large Excel Import Progress, Error Reports & Pagination
+   ============================================================ */
+.import-progress-panel {
+  margin: 18px 28px 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #0d1510;
+  border: 1px solid #2c4031;
+}
+
+.progress-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.progress-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.progress-title-group strong {
+  display: block;
+  color: #edf7ef;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-title-group small {
+  display: block;
+  margin-top: 3px;
+  color: #9caf9f;
+  font-size: 11px;
+}
+
+.import-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.status-badge-active {
+  background: #1b2e20;
+  border-color: #36573b;
+  color: #bef264;
+}
+
+.status-badge-success {
+  background: #193121;
+  border-color: #2f6b41;
+  color: #a3e635;
+}
+
+.status-badge-warn {
+  background: #302412;
+  border-color: #6b4e1e;
+  color: #fcd34d;
+}
+
+.status-badge-error {
+  background: #311716;
+  border-color: #6e2d2a;
+  color: #ffb4aa;
+}
+
+.progress-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 9px;
+  border-radius: 999px;
+  background: #17251b;
+  border: 1px solid #2a3e2f;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #65a30d, #a3e635, #bef264);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.progress-fill-warn {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.progress-fill.progress-fill-error {
+  background: linear-gradient(90deg, #dc2626, #f87171);
+}
+
+.progress-percent {
+  min-width: 46px;
+  text-align: right;
+  color: #bef264;
+  font: 700 13px Manrope, sans-serif;
+}
+
+.progress-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.progress-stat {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #121e16;
+  border: 1px solid #243629;
+}
+
+.progress-stat span {
+  display: block;
+  color: #8ca291;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.progress-stat strong {
+  display: block;
+  margin-top: 4px;
+  color: #edf7ef;
+  font: 700 16px Manrope, sans-serif;
+}
+
+.progress-stat.stat-success strong {
+  color: #a3e635;
+}
+
+.progress-stat.stat-rejected strong {
+  color: #ffb4aa;
+}
+
+.result-check.result-warn {
+  background: #302412;
+  color: #fcd34d;
+}
+
+.error-report-box {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #231814;
+  border: 1px solid #59352a;
+}
+
+.error-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.error-report-header strong {
+  display: block;
+  color: #fed7aa;
+  font-size: 12.5px;
+}
+
+.error-report-header p {
+  margin: 4px 0 0;
+  color: #d6b8a8;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.error-report-btn {
+  border-color: #6b4335 !important;
+  background: #2e1d17 !important;
+  color: #fdba74 !important;
+}
+
+.error-report-btn:hover:not(:disabled) {
+  background: #3f271f !important;
+  border-color: #fb923c !important;
+  color: #fed7aa !important;
+}
+
+.sample-error-list {
+  margin: 12px 0 6px;
+  padding-left: 18px;
+  color: #ffb4aa;
+  font-size: 11px;
+  line-height: 1.5;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.rejected-count-pill {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #311716;
+  color: #ffb4aa;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.dept-filter-select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid #34463a;
+  border-radius: 8px;
+  background: #0c140f;
+  color: #dce8de;
+  font-size: 12px;
+  outline: none;
+}
+
+.dept-filter-select:focus {
+  border-color: #9bd64f;
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-size-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #9caf9f;
+  font-size: 11px;
+  margin-right: 6px;
+}
+
+.page-select {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #34463a;
+  border-radius: 6px;
+  background: #0c140f;
+  color: #dce8de;
+  font-size: 11px;
+}
+
+.page-btn {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #34463a;
+  border-radius: 6px;
+  background: #141f17;
+  color: #d3e2d5;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #8bc34a;
+  color: #bef264;
+  background: #1c2a1e;
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  color: #c4d2c7;
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .import-progress-panel {
+    margin: 14px 18px 20px;
+    padding: 16px;
+  }
+
+  .progress-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toolbar-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dept-filter-select {
+    width: 100%;
+  }
+
+  .page-controls {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
