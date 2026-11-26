@@ -251,19 +251,23 @@ button:disabled {
 
 @media (max-width: 680px) {
   .mapping-container {
-    padding: 0 18px 22px;
+    padding: 0 14px 18px;
   }
 
   .mapping-section {
-    padding: 16px;
+    padding: 14px;
   }
 
   .mapping-heading {
     flex-direction: column;
   }
 
+  select {
+    min-width: 0;
+  }
+
   th,
   td {
-    padding: 10px 8px;
+    padding: 10px 6px;
   }
 }

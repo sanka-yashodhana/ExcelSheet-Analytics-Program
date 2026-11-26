@@ -66,22 +66,22 @@ import { AnalyticsApiService, Employee, ImportHistory } from '../services/analyt
           <table class="employee-table history-table">
             <thead><tr><th>Spreadsheet</th><th>History ID</th><th>Uploaded</th><th>Rows imported</th><th>Rejected</th><th>Records now</th><th>Status</th><th style="text-align: right">Actions</th></tr></thead>
             <tbody><tr *ngFor="let history of histories">
-              <td><div class="employee-cell"><span class="file-badge">XLSX</span><div><strong>{{ history.fileName }}</strong><span>{{ history.totalRows | number }} total rows</span></div></div></td>
-              <td><span class="code-tag">#{{ history.id }}</span></td>
-              <td>{{ history.uploadedDate | date:'MMM d, y · h:mm a' }}</td>
-              <td>{{ (history.importedRows ?? history.totalRows) | number }}</td>
-              <td>
+              <td class="td-primary" data-label="Spreadsheet"><div class="employee-cell"><span class="file-badge">XLSX</span><div><strong>{{ history.fileName }}</strong><span>{{ history.totalRows | number }} total rows</span></div></div></td>
+              <td data-label="History ID"><span class="code-tag">#{{ history.id }}</span></td>
+              <td data-label="Uploaded">{{ history.uploadedDate | date:'MMM d, y · h:mm a' }}</td>
+              <td data-label="Rows imported">{{ (history.importedRows ?? history.totalRows) | number }}</td>
+              <td data-label="Rejected">
                 <span [class.rejected-count-pill]="(history.rejectedRows ?? 0) > 0">
                   {{ (history.rejectedRows ?? 0) | number }}
                 </span>
               </td>
-              <td>{{ history.employeeCount | number }}</td>
-              <td>
+              <td data-label="Records now">{{ history.employeeCount | number }}</td>
+              <td data-label="Status">
                 <span class="import-status-badge" [ngClass]="statusBadgeClass(history.status)">
                   {{ formatStatus(history.status) }}
                 </span>
               </td>
-              <td style="text-align: right">
+              <td class="td-actions" data-label="Actions" style="text-align: right">
                 <div class="table-actions">
                   <button
                     *ngIf="history.hasErrorReport"
@@ -176,17 +176,17 @@ import { AnalyticsApiService, Employee, ImportHistory } from '../services/analyt
         <div class="table-scroll" *ngIf="!isDetailLoading && !detailErrors.length && employees.length">
           <table class="employee-table"><thead><tr><th>Employee</th><th>Employee code</th><th>Department</th><th>Job title</th><th>Salary</th><th>Hire date</th><th>History ID</th></tr></thead>
             <tbody><tr *ngFor="let employee of employees">
-              <td><div class="employee-cell"><span class="avatar">{{ initials(employee) }}</span><div><strong>{{ employee.firstName }} {{ employee.lastName }}</strong><span>Employee #{{ employee.id }}</span></div></div></td>
-              <td><span class="code-tag">{{ employee.employeeCode }}</span></td><td><span class="department-tag">{{ employee.department }}</span></td><td>{{ employee.jobTitle }}</td>
-              <td class="salary-cell">{{ employee.salary | currency:'USD':'symbol':'1.0-2' }}</td><td>{{ employee.hireDate | date:'MMM d, y' }}</td><td><span class="code-tag">#{{ employee.importHistoryId }}</span></td>
+              <td class="td-primary" data-label="Employee"><div class="employee-cell"><span class="avatar">{{ initials(employee) }}</span><div><strong>{{ employee.firstName }} {{ employee.lastName }}</strong><span>Employee #{{ employee.id }}</span></div></div></td>
+              <td data-label="Employee code"><span class="code-tag">{{ employee.employeeCode }}</span></td><td data-label="Department"><span class="department-tag">{{ employee.department }}</span></td><td data-label="Job title">{{ employee.jobTitle }}</td>
+              <td data-label="Salary" class="salary-cell">{{ employee.salary | currency:'USD':'symbol':'1.0-2' }}</td><td data-label="Hire date">{{ employee.hireDate | date:'MMM d, y' }}</td><td data-label="History ID"><span class="code-tag">#{{ employee.importHistoryId }}</span></td>
             </tr></tbody>
           </table>
         </div>
         <div class="table-footer pagination-bar" *ngIf="!isDetailLoading && !detailErrors.length && totalCount > 0">
-          <span>Showing {{ rangeStart | number }}–{{ rangeEnd | number }} of {{ totalCount | number }} records</span>
-          <div class="page-controls">
+          <div class="pagination-summary">
+            <span>Showing {{ rangeStart | number }}–{{ rangeEnd | number }} of {{ totalCount | number }} records</span>
             <label class="page-size-label">
-              Rows:
+              <span>Rows</span>
               <select class="page-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" aria-label="Rows per page">
                 <option [ngValue]="10">10</option>
                 <option [ngValue]="25">25</option>
@@ -194,11 +194,13 @@ import { AnalyticsApiService, Employee, ImportHistory } from '../services/analyt
                 <option [ngValue]="100">100</option>
               </select>
             </label>
-            <button class="page-btn" type="button" [disabled]="page <= 1" (click)="goToPage(1)">«</button>
+          </div>
+          <div class="page-controls">
+            <button class="page-btn page-btn-edge" type="button" [disabled]="page <= 1" (click)="goToPage(1)" title="First page">«</button>
             <button class="page-btn" type="button" [disabled]="page <= 1" (click)="goToPage(page - 1)">Prev</button>
-            <span class="page-indicator">Page {{ page | number }} of {{ totalPages | number }}</span>
+            <span class="page-indicator">Page {{ page | number }} / {{ totalPages | number }}</span>
             <button class="page-btn" type="button" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">Next</button>
-            <button class="page-btn" type="button" [disabled]="page >= totalPages" (click)="goToPage(totalPages)">»</button>
+            <button class="page-btn page-btn-edge" type="button" [disabled]="page >= totalPages" (click)="goToPage(totalPages)" title="Last page">»</button>
           </div>
         </div>
       </section>

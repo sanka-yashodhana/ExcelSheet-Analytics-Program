@@ -1692,7 +1692,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.pagination-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
@@ -1709,11 +1716,10 @@ body {
   gap: 6px;
   color: #9caf9f;
   font-size: 11px;
-  margin-right: 6px;
 }
 
 .page-select {
-  height: 30px;
+  height: 32px;
   padding: 0 8px;
   border: 1px solid #34463a;
   border-radius: 6px;
@@ -1723,10 +1729,11 @@ body {
 }
 
 .page-btn {
-  min-height: 30px;
+  min-height: 32px;
+  min-width: 34px;
   padding: 0 10px;
   border: 1px solid #34463a;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #141f17;
   color: #d3e2d5;
   font-size: 11px;
@@ -1749,13 +1756,34 @@ body {
 .page-indicator {
   color: #c4d2c7;
   font-size: 11px;
+  font-weight: 600;
   padding: 0 4px;
+  white-space: nowrap;
 }
 
 @media (max-width: 768px) {
+  .app-shell {
+    overflow-x: clip;
+  }
+
+  .import-layout > div,
+  .directory-card,
+  .panel {
+    min-width: 0;
+  }
+
+  .side-stack {
+    grid-template-columns: 1fr;
+  }
+
   .import-progress-panel {
-    margin: 14px 18px 20px;
+    margin: 14px 16px 20px;
     padding: 16px;
+  }
+
+  .progress-header-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .progress-stats-grid {
@@ -1764,15 +1792,191 @@ body {
 
   .toolbar-controls {
     width: 100%;
-    justify-content: stretch;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .dept-filter-select {
+  .dept-filter-select,
+  .search-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .pagination-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .pagination-summary {
     width: 100%;
+    justify-content: space-between;
+    gap: 10px;
   }
 
   .page-controls {
     width: 100%;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-btn {
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-indicator {
+    text-align: center;
+    font-size: 11.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .page-select {
+    height: 34px;
+  }
+}
+
+/* Mobile Card Layout for Employee & History Tables */
+@media (max-width: 680px) {
+  .table-scroll {
+    overflow-x: visible;
+    padding: 10px 12px;
+  }
+
+  .employee-table,
+  .employee-table tbody {
+    display: block;
+    width: 100%;
+    white-space: normal;
+  }
+
+  .employee-table thead {
+    display: none;
+  }
+
+  .employee-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border: 1px solid #283a2d;
+    border-radius: 12px;
+    background: #131e16;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+
+  .employee-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .employee-table tbody tr:hover {
+    background: #16241a;
+  }
+
+  .employee-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 8px 0;
+    border-top: 1px solid #202f24;
+    text-align: right;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .employee-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: #8ca291;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+
+  .employee-table td.td-primary {
+    display: block;
+    padding: 0 0 10px;
+    border-top: 0;
+    text-align: left;
+  }
+
+  .employee-table td.td-primary::before {
+    display: none;
+  }
+
+  .employee-table td.td-primary .employee-cell {
+    min-width: 0;
+  }
+
+  .employee-table td.td-primary .employee-cell strong {
+    font-size: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .source-workbook-link {
+    max-width: 100%;
+    text-align: right;
+  }
+
+  .employee-table td.td-actions {
+    display: block;
+    padding: 12px 0 2px;
+    text-align: left !important;
+  }
+
+  .employee-table td.td-actions::before {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .employee-table td.td-actions .table-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .employee-table td.td-actions .table-action-button,
+  .employee-table td.td-actions .history-view-link {
+    width: 100%;
+    min-height: 36px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    text-align: center;
+    border-radius: 8px;
+  }
+
+  .employee-table td.td-actions .history-view-link {
+    border: 1px solid #2e4432;
+    background: #17271c;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .page-btn-edge {
+    display: none !important;
+  }
+
+  .page-controls {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .employee-table td.td-actions .table-actions {
+    grid-template-columns: 1fr;
   }
 }

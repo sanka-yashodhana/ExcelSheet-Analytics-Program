@@ -98,22 +98,22 @@ import { PREDEFINED_DEPARTMENTS } from '../services/employee-analytics.service';
         <table class="employee-table">
           <thead><tr><th>Employee</th><th>Employee code</th><th>Department</th><th>Job title</th><th>Salary</th><th>Hire date</th><th>Source workbook</th></tr></thead>
           <tbody><tr *ngFor="let employee of employees">
-            <td><div class="employee-cell"><span class="avatar">{{ initials(employee) }}</span><div><strong>{{ employee.firstName }} {{ employee.lastName }}</strong><span>Employee #{{ employee.id }}</span></div></div></td>
-            <td><span class="code-tag">{{ employee.employeeCode }}</span></td>
-            <td><span class="department-tag">{{ employee.department }}</span></td>
-            <td>{{ employee.jobTitle }}</td>
-            <td class="salary-cell">{{ employee.salary | currency:'USD':'symbol':'1.0-2' }}</td>
-            <td>{{ employee.hireDate | date:'MMM d, y' }}</td>
-            <td><a class="source-workbook-link" [routerLink]="['/imports', employee.importHistoryId]"><strong>{{ employee.importFileName || 'Workbook #' + employee.importHistoryId }}</strong><small>History ID #{{ employee.importHistoryId }}</small></a></td>
+            <td class="td-primary" data-label="Employee"><div class="employee-cell"><span class="avatar">{{ initials(employee) }}</span><div><strong>{{ employee.firstName }} {{ employee.lastName }}</strong><span>Employee #{{ employee.id }}</span></div></div></td>
+            <td data-label="Employee code"><span class="code-tag">{{ employee.employeeCode }}</span></td>
+            <td data-label="Department"><span class="department-tag">{{ employee.department }}</span></td>
+            <td data-label="Job title">{{ employee.jobTitle }}</td>
+            <td data-label="Salary" class="salary-cell">{{ employee.salary | currency:'USD':'symbol':'1.0-2' }}</td>
+            <td data-label="Hire date">{{ employee.hireDate | date:'MMM d, y' }}</td>
+            <td data-label="Source workbook"><a class="source-workbook-link" [routerLink]="['/imports', employee.importHistoryId]"><strong>{{ employee.importFileName || 'Workbook #' + employee.importHistoryId }}</strong><small>History ID #{{ employee.importHistoryId }}</small></a></td>
           </tr></tbody>
         </table>
       </div>
 
       <div class="table-footer pagination-bar" *ngIf="!isLoading && !errors.length && totalEmployeesInDb > 0">
-        <span>Showing {{ rangeStart | number }}–{{ rangeEnd | number }} of {{ totalCount | number }} records</span>
-        <div class="page-controls" *ngIf="totalCount > 0">
-          <label class="page-size-label">
-            Rows:
+        <div class="pagination-summary">
+          <span>Showing {{ rangeStart | number }}–{{ rangeEnd | number }} of {{ totalCount | number }} records</span>
+          <label class="page-size-label" *ngIf="totalCount > 0">
+            <span>Rows</span>
             <select class="page-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" aria-label="Rows per page">
               <option [ngValue]="10">10</option>
               <option [ngValue]="25">25</option>
@@ -121,11 +121,13 @@ import { PREDEFINED_DEPARTMENTS } from '../services/employee-analytics.service';
               <option [ngValue]="100">100</option>
             </select>
           </label>
-          <button class="page-btn" type="button" [disabled]="page <= 1" (click)="goToPage(1)" title="First page">«</button>
+        </div>
+        <div class="page-controls" *ngIf="totalCount > 0">
+          <button class="page-btn page-btn-edge" type="button" [disabled]="page <= 1" (click)="goToPage(1)" title="First page">«</button>
           <button class="page-btn" type="button" [disabled]="page <= 1" (click)="goToPage(page - 1)">Prev</button>
-          <span class="page-indicator">Page {{ page | number }} of {{ totalPages | number }}</span>
+          <span class="page-indicator">Page {{ page | number }} / {{ totalPages | number }}</span>
           <button class="page-btn" type="button" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">Next</button>
-          <button class="page-btn" type="button" [disabled]="page >= totalPages" (click)="goToPage(totalPages)" title="Last page">»</button>
+          <button class="page-btn page-btn-edge" type="button" [disabled]="page >= totalPages" (click)="goToPage(totalPages)" title="Last page">»</button>
         </div>
       </div>
     </section>

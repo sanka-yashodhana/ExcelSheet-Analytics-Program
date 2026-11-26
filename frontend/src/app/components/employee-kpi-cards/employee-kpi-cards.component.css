@@ -28,7 +28,8 @@
 
 @media (max-width: 768px) {
   .kpi-container {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
   }
 }
 
@@ -36,5 +37,13 @@
   .kpi-container {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .kpi-card {
+    padding: 18px;
+  }
+
+  .kpi-card h1 {
+    font-size: 24px;
   }
 }
