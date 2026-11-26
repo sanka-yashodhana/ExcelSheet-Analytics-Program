@@ -41,7 +41,12 @@ builder.Services.AddHostedService<LargeExcelImportWorker>();
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(15),
+            errorNumbersToAdd: null)));
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
@@ -111,7 +116,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (db.Database.CanConnect())
+        var strategy = db.Database.CreateExecutionStrategy();
+        strategy.Execute(() =>
         {
             DatabaseSchemaInitializer.EnsureSchemaAndIndexes(db);
 
@@ -134,7 +140,7 @@ using (var scope = app.Services.CreateScope())
             {
                 db.SaveChanges();
             }
-        }
+        });
     }
     catch
     {

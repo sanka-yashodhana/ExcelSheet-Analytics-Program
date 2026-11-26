@@ -160,7 +160,9 @@ export class AnalyticsApiService {
   private readonly baseUrl =
     window.location.port === "4200"
       ? "http://localhost:5239/api"
-      : "https://employee-excel-analytics-api-fbbdcteuegdne3f7.eastasia-01.azurewebsites.net/api";
+      : window.location.hostname.endsWith(".azurestaticapps.net")
+        ? "https://employee-excel-analytics-api-fbbdcteuegdne3f7.eastasia-01.azurewebsites.net/api"
+        : "/api";
 
   getImportConfig(): Observable<ExcelImportConfig> {
     return this.http.get<ExcelImportConfig>(

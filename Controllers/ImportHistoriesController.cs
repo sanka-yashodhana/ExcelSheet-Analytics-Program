@@ -151,24 +151,28 @@ namespace EmployeeExcelAnalytics.Api.Controllers
 
             int deletedEmployees = 0;
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                deletedEmployees = await _context.Employees
-                    .Where(e => e.ImportHistoryId == id)
-                    .ExecuteDeleteAsync();
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    deletedEmployees = await _context.Employees
+                        .Where(e => e.ImportHistoryId == id)
+                        .ExecuteDeleteAsync();
 
-                await _context.ImportHistories
-                    .Where(h => h.Id == id)
-                    .ExecuteDeleteAsync();
+                    await _context.ImportHistories
+                        .Where(h => h.Id == id)
+                        .ExecuteDeleteAsync();
 
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
 
             if (!string.IsNullOrWhiteSpace(history.ErrorReportPath) && System.IO.File.Exists(history.ErrorReportPath))
             {
