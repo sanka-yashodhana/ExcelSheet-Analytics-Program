@@ -47,7 +47,7 @@ builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularFrontend", policy =>
-        policy.WithOrigins("http://localhost:4200", "https://your-production-app.com")
+        policy.WithOrigins("http://localhost:4200", "https://zealous-tree-07dd2ac00.4.azurestaticapps.net")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });

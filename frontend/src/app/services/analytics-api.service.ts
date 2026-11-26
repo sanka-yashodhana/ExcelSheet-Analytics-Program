@@ -1,4 +1,9 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpParams,
+} from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
@@ -152,14 +157,18 @@ export class AnalyticsApiService {
     "Cache-Control": "no-cache",
     Pragma: "no-cache",
   });
-  private readonly baseUrl = window.location.port === '4200'
-    ? 'http://localhost:5239/api'
-    : '/api';
+  private readonly baseUrl =
+    window.location.port === "4200"
+      ? "http://localhost:5239/api"
+      : "https://employee-excel-analytics-api-fbbdcteuegdne3f7.eastasia-01.azurewebsites.net/api";
 
   getImportConfig(): Observable<ExcelImportConfig> {
-    return this.http.get<ExcelImportConfig>(`${this.baseUrl}/ExcelImport/config`, {
-      headers: this.noCacheHeaders,
-    });
+    return this.http.get<ExcelImportConfig>(
+      `${this.baseUrl}/ExcelImport/config`,
+      {
+        headers: this.noCacheHeaders,
+      },
+    );
   }
 
   upload(
@@ -216,10 +225,13 @@ export class AnalyticsApiService {
     );
   }
 
-  getEmployeesPaged(query: PagedEmployeesQuery): Observable<PagedEmployeesResponse> {
+  getEmployeesPaged(
+    query: PagedEmployeesQuery,
+  ): Observable<PagedEmployeesResponse> {
     let params = new HttpParams();
     if (query.page !== undefined) params = params.set("page", query.page);
-    if (query.pageSize !== undefined) params = params.set("pageSize", query.pageSize);
+    if (query.pageSize !== undefined)
+      params = params.set("pageSize", query.pageSize);
     if (query.search) params = params.set("search", query.search);
     if (query.department) params = params.set("department", query.department);
     if (query.importHistoryId !== undefined) {
@@ -228,16 +240,22 @@ export class AnalyticsApiService {
     if (query.sortBy) params = params.set("sortBy", query.sortBy);
     if (query.sortDir) params = params.set("sortDir", query.sortDir);
 
-    return this.http.get<PagedEmployeesResponse>(`${this.baseUrl}/Employees/paged`, {
-      params,
-      headers: this.noCacheHeaders,
-    });
+    return this.http.get<PagedEmployeesResponse>(
+      `${this.baseUrl}/Employees/paged`,
+      {
+        params,
+        headers: this.noCacheHeaders,
+      },
+    );
   }
 
   getAnalyticsSummary(): Observable<EmployeeAnalyticsSummary> {
-    return this.http.get<EmployeeAnalyticsSummary>(`${this.baseUrl}/Employees/analytics`, {
-      headers: this.noCacheHeaders,
-    });
+    return this.http.get<EmployeeAnalyticsSummary>(
+      `${this.baseUrl}/Employees/analytics`,
+      {
+        headers: this.noCacheHeaders,
+      },
+    );
   }
 
   getImportHistories(): Observable<ImportHistory[]> {
@@ -247,7 +265,9 @@ export class AnalyticsApiService {
   }
 
   getImportHistoryById(id: number): Observable<ImportHistory> {
-    return this.http.get<ImportHistory>(`${this.baseUrl}/ImportHistories/${id}`);
+    return this.http.get<ImportHistory>(
+      `${this.baseUrl}/ImportHistories/${id}`,
+    );
   }
 
   deleteAllEmployees(): Observable<DeleteEmployeesResult> {
